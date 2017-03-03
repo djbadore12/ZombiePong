@@ -61,9 +61,10 @@ namespace ZombiePong
 
             paddle1 = new Sprite(new Vector2(20, 20), spritesheet, new Rectangle(0, 516, 25, 150), Vector2.Zero);
             paddle2 = new Sprite(new Vector2(970, 20), spritesheet, new Rectangle(32, 516, 25, 150), Vector2.Zero);
-            ball = new Sprite(new Vector2(700, 350), spritesheet, new Rectangle(76, 510, 40, 40), new Vector2(30, 0));
+            ball = new Sprite(new Vector2(700, 350), spritesheet, new Rectangle(76, 510, 40, 40), new Vector2(120, 30));
 
             SpawnZombie(new Vector2(400, 400), new Vector2(-20, 0));
+            SpawnZombie(new Vector2(420, 300), new Vector2(20, 0));
         }
 
         /// <summary>
@@ -101,13 +102,34 @@ namespace ZombiePong
             // TODO: Add your update logic here
             ball.Update(gameTime);
 
+            paddle2.Location = new Vector2(paddle2.Location.X, ball.Center.Y - 60);
+            if (paddle2.IsBoxColliding(ball.BoundingBoxRect) || paddle1.IsBoxColliding(ball.BoundingBoxRect))
+            {
+                ball.Velocity *= new Vector2(-1, 1);
+            }
+
+            if (ball.Location.Y < 0 || ball.Location.Y < background.Height)
+            {
+                ball.Velocity *= new Vector2(1, -1);
+               
+            }
             for (int i = 0; i < zombies.Count; i++)
             {
                 zombies[i].Update(gameTime);
 
                 // Zombie logic goes here.. 
-                zombies[i].FlipHorizontal = false;
+                if (zombies[i].Velocity.X > 0)
+                {
+                    zombies[i].FlipHorizontal = true;
+                }
+                else
+                {
+                    zombies[i].FlipHorizontal = false;
+                }
             }
+
+            MouseState ms = Mouse.GetState();
+            paddle1.Location = new Vector2(paddle1.Location.X, ms.Y);
 
             base.Update(gameTime);
         }
@@ -124,12 +146,15 @@ namespace ZombiePong
             
             spriteBatch.Draw(background, Vector2.Zero, Color.White);
 
+
+
             paddle1.Draw(spriteBatch);
             paddle2.Draw(spriteBatch);
             ball.Draw(spriteBatch);
 
             for (int i = 0; i < zombies.Count; i++)
             {
+                
                 zombies[i].Draw(spriteBatch);
             }
 
