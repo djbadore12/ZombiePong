@@ -19,6 +19,7 @@ namespace ZombiePong
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         Texture2D background, spritesheet;
+        float ballSpeed = 350;
 
         Sprite paddle1, paddle2, ball;
 
@@ -99,6 +100,12 @@ namespace ZombiePong
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
 
+            Vector2 bvel = ball.Velocity;
+            bvel.Normalize();
+            bvel *= ballSpeed;
+            ball.Velocity = bvel;
+
+
             // TODO: Add your update logic here
             ball.Update(gameTime);
 
@@ -108,8 +115,8 @@ namespace ZombiePong
                 ball.Velocity *= new Vector2(-1, 1);
             }
 
-            if (ball.Location.Y < 0 || ball.Location.Y < background.Height)
-            {
+            if (ball.Location.Y < 0 || ball.Location.Y > this.Window.ClientBounds.Height-ball.BoundingBoxRect.Height)
+            { 
                 ball.Velocity *= new Vector2(1, -1);
                
             }
@@ -117,6 +124,15 @@ namespace ZombiePong
             {
                 zombies[i].Update(gameTime);
 
+                // int width = this.Window.ClientBounds.Width;
+                if (zombies[i].Location.X > 700 || zombies[i].Location.X < 150)
+                    zombies[i].Velocity *= new Vector2(-1, -1);
+
+
+                if (Vector2.Distance(zombies[i].Center, ball.Center) < 50)
+                {
+                    ball.Velocity *= new Vector2(-1, 1)
+;                }
                 // Zombie logic goes here.. 
                 if (zombies[i].Velocity.X > 0)
                 {
