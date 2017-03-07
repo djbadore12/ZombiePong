@@ -22,7 +22,7 @@ namespace ZombiePong
         float ballSpeed = 350;
 
         Sprite paddle1, paddle2, ball;
-
+        int score1, score2;
         List<Sprite> zombies = new List<Sprite>();
 
         public Game1()
@@ -56,6 +56,9 @@ namespace ZombiePong
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
+
+            score1 = 0;
+            score2 = 0;
 
             background = Content.Load<Texture2D>("background");
             spritesheet = Content.Load<Texture2D>("spritesheet");
@@ -108,6 +111,13 @@ namespace ZombiePong
 
             // TODO: Add your update logic here
             ball.Update(gameTime);
+
+            if (ball.Location.X < -32)
+            {
+                ball.Location = new Vector2(400,300);
+                score2++;
+            }
+            Window.Title = "Player 1: " + score1 + " | " + "Player 2: " + score2;
 
             paddle2.Location = new Vector2(paddle2.Location.X, ball.Center.Y - 60);
             if (paddle2.IsBoxColliding(ball.BoundingBoxRect) || paddle1.IsBoxColliding(ball.BoundingBoxRect))
