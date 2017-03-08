@@ -19,11 +19,12 @@ namespace ZombiePong
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         Texture2D background, spritesheet;
-        float ballSpeed = 350;
+        float ballSpeed = 550;
 
         Sprite paddle1, paddle2, ball;
         int score1, score2;
         List<Sprite> zombies = new List<Sprite>();
+        Random rand = new Random(System.Environment.TickCount);
 
         public Game1()
         {
@@ -64,8 +65,8 @@ namespace ZombiePong
             spritesheet = Content.Load<Texture2D>("spritesheet");
 
             paddle1 = new Sprite(new Vector2(20, 20), spritesheet, new Rectangle(0, 516, 25, 150), Vector2.Zero);
-            paddle2 = new Sprite(new Vector2(970, 20), spritesheet, new Rectangle(32, 516, 25, 150), Vector2.Zero);
-            ball = new Sprite(new Vector2(700, 350), spritesheet, new Rectangle(76, 510, 40, 40), new Vector2(120, 30));
+            paddle2 = new Sprite(new Vector2(970, 20), spritesheet, new Rectangle(32, 516, 25, 150), new Vector2(0, 90));
+            ball = new Sprite(new Vector2(700, 350), spritesheet, new Rectangle(76, 510, 40, 40), new Vector2(180, 30));
 
             SpawnZombie(new Vector2(400, 400), new Vector2(-20, 0));
             SpawnZombie(new Vector2(420, 300), new Vector2(20, 0));
@@ -112,17 +113,53 @@ namespace ZombiePong
             // TODO: Add your update logic here
             ball.Update(gameTime);
 
-            if (ball.Location.X < -32)
+            if (rand.Next(0, 100) < 60)
             {
+                paddle2.Velocity = new Vector2(0, ball.Center.Y - paddle2.Center.Y);
+            }
+            else
+            {
+                float speed = paddle2.Velocity.Length();
+                speed *= 0.9f;
+
+                Vector2 vel = paddle2.Velocity;
+                vel.Normalize();
+                vel *= speed;
+                paddle2.Velocity = vel;
+            }
+
+            if (ball.Location.X < -32 || ball.Location.X > this.Window.ClientBounds.Width)
+            {
+                if (ball.Location.X < -32)
+                    score2++;
+                else
+                    score1++;
+
                 ball.Location = new Vector2(400,300);
-                score2++;
+
+                int flipX = 1, flipY = 1;
+                if (rand.Next(0, 100) < 50)
+                    flipX *= -1;
+
+                if (rand.Next(0, 100) < 50)
+                    flipY *= -1;
+
+                ball.Velocity *= new Vector2(flipX, flipY);
+
+
             }
             Window.Title = "Player 1: " + score1 + " | " + "Player 2: " + score2;
 
-            paddle2.Location = new Vector2(paddle2.Location.X, ball.Center.Y - 60);
-            if (paddle2.IsBoxColliding(ball.BoundingBoxRect) || paddle1.IsBoxColliding(ball.BoundingBoxRect))
+            //paddle2.Location = new Vector2(paddle2.Location.X, ball.Center.Y - 60);
+            if (paddle2.IsBoxColliding(ball.BoundingBoxRect))
             {
                 ball.Velocity *= new Vector2(-1, 1);
+                ball.Location = new Vector2(paddle2.Location.X - ball.BoundingBoxRect.Width, ball.Location.Y);
+            }
+            if (paddle1.IsBoxColliding(ball.BoundingBoxRect))
+            {
+                ball.Velocity *= new Vector2(-1, 1);
+                ball.Location = new Vector2(paddle1.Location.X + paddle1.BoundingBoxRect.Width, ball.Location.Y);
             }
 
             if (ball.Location.Y < 0 || ball.Location.Y > this.Window.ClientBounds.Height-ball.BoundingBoxRect.Height)
@@ -154,8 +191,11 @@ namespace ZombiePong
                 }
             }
 
+            paddle2.Update(gameTime);
+
             MouseState ms = Mouse.GetState();
-            paddle1.Location = new Vector2(paddle1.Location.X, ms.Y);
+            paddle1.Location = new Vector2(paddle1.Location.X, MathHelper.Clamp(ms.Y, 0, this.Window.ClientBounds.Height-paddle1.BoundingBoxRect.Height));
+            paddle2.Location = new Vector2(paddle2.Location.X, MathHelper.Clamp(paddle2.Location.Y, 0, this.Window.ClientBounds.Height - paddle2.BoundingBoxRect.Height));
 
             base.Update(gameTime);
         }
