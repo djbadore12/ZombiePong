@@ -128,7 +128,7 @@ namespace ZombiePong
                 vel *= speed;
                 paddle2.Velocity = vel;
             }
-            
+
             if (ball.Location.X < -32 || ball.Location.X > this.Window.ClientBounds.Width)
             {
                 if (ball.Location.X < -32)
@@ -136,7 +136,7 @@ namespace ZombiePong
                 else
                     score1++;
 
-                ball.Location = new Vector2(400,300);
+                ball.Location = new Vector2(400, 300);
 
                 int flipX = 1, flipY = 1;
                 if (rand.Next(0, 100) < 50)
@@ -168,70 +168,72 @@ namespace ZombiePong
                     else
                         ball.Velocity *= new Vector2(-1, -1);
                 }
-
             
+
                 ball.Location = new Vector2(paddle2.Location.X - ball.BoundingBoxRect.Width, ball.Location.Y);
-
-                if (paddle1.IsBoxColliding(ball.BoundingBoxRect))
-                {
-                    if (ball.Center.Y > paddle1.Center.Y)
-                    {
-                        if (ball.Velocity.Y < 0)
-                            ball.Velocity *= new Vector2(-1, -1);
-                        else
-                            ball.Velocity *= new Vector2(-1, 1);
-                    }
-                    else
-                    {
-                        if (ball.Velocity.Y < 0)
-                            ball.Velocity *= new Vector2(-1, 1);
-                        else
-                            ball.Velocity *= new Vector2(-1, -1);
-                    }
-
-
-                
-
-                    ball.Location = new Vector2(paddle1.Location.X + paddle1.BoundingBoxRect.Width, ball.Location.Y);
-
-                }
-
-                if (ball.Location.Y < 0 || ball.Location.Y > this.Window.ClientBounds.Height - ball.BoundingBoxRect.Height)
-                {
-                    ball.Velocity *= new Vector2(1, -1);
-
-                }
-                for (int i = 0; i < zombies.Count; i++)
-                {
-                    zombies[i].Update(gameTime);
-
-                    // int width = this.Window.ClientBounds.Width;
-                    if (zombies[i].Location.X > 700 || zombies[i].Location.X < 150)
-                        zombies[i].Velocity *= new Vector2(-1, -1);
-
-
-                    if (Vector2.Distance(zombies[i].Center, ball.Center) < 50)
-                    {
-                        ball.Velocity *= new Vector2(-1, 1);
-                    }
-                    // Zombie logic goes here.. 
-                    if (zombies[i].Velocity.X > 0)
-                    {
-                        zombies[i].FlipHorizontal = true;
-                    }
-                    else
-                    {
-                        zombies[i].FlipHorizontal = false;
-                    }
-                }
-                paddle2.Update(gameTime);
-
-                MouseState ms = Mouse.GetState();
-                paddle1.Location = new Vector2(paddle1.Location.X, MathHelper.Clamp(ms.Y, 0, this.Window.ClientBounds.Height - paddle1.BoundingBoxRect.Height));
-                paddle2.Location = new Vector2(paddle2.Location.X, MathHelper.Clamp(paddle2.Location.Y, 0, this.Window.ClientBounds.Height - paddle2.BoundingBoxRect.Height));
-
-                base.Update(gameTime);
             }
+
+            if (paddle1.IsBoxColliding(ball.BoundingBoxRect))
+            {
+                if (ball.Center.Y > paddle1.Center.Y)
+                {
+                    if (ball.Velocity.Y < 0)
+                        ball.Velocity *= new Vector2(-1, -1);
+                    else
+                        ball.Velocity *= new Vector2(-1, 1);
+                }
+                else
+                {
+                    if (ball.Velocity.Y < 0)
+                        ball.Velocity *= new Vector2(-1, 1);
+                    else
+                        ball.Velocity *= new Vector2(-1, -1);
+                }
+
+
+
+
+                  ball.Location = new Vector2(paddle1.Location.X + paddle1.BoundingBoxRect.Width, ball.Location.Y);
+
+            }
+
+            if (ball.Location.Y < 0 || ball.Location.Y > this.Window.ClientBounds.Height - ball.BoundingBoxRect.Height)
+            {
+                ball.Velocity *= new Vector2(1, -1);
+
+            }
+            for (int i = 0; i < zombies.Count; i++)
+            {
+                zombies[i].Update(gameTime);
+
+                // int width = this.Window.ClientBounds.Width;
+                if (zombies[i].Location.X > 700 || zombies[i].Location.X < 150)
+                    zombies[i].Velocity *= new Vector2(-1, -1);
+
+
+                if (Vector2.Distance(zombies[i].Center, ball.Center) < 50)
+                {
+                    ball.Velocity *= new Vector2(-1, 1);
+                }
+                // Zombie logic goes here.. 
+                if (zombies[i].Velocity.X > 0)
+                {
+                    zombies[i].FlipHorizontal = true;
+                }
+                else
+                {
+                    zombies[i].FlipHorizontal = false;
+                }
+            }
+            paddle2.Update(gameTime);
+
+            MouseState ms = Mouse.GetState();
+            paddle1.Location = new Vector2(paddle1.Location.X, MathHelper.Clamp(ms.Y, 0, this.Window.ClientBounds.Height - paddle1.BoundingBoxRect.Height));
+            paddle2.Location = new Vector2(paddle2.Location.X, MathHelper.Clamp(paddle2.Location.Y, 0, this.Window.ClientBounds.Height - paddle2.BoundingBoxRect.Height));
+
+            base.Update(gameTime);
+            
+        }
 
         /// <summary>
         /// This is called when the game should draw itself.
